@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SkillCraft // Task Blueprint</title>
+<style>
+  :root {
+    --bg: #0b1626;
+    --grid-line: rgba(255,255,255,0.045);
+    --panel: #142238;
+    --panel-border: rgba(255,255,255,0.08);
+    --row: #16283f;
+    --row-border: rgba(255,255,255,0.06);
+    --cream: #f4f0e6;
+    --muted: #7c8ba0;
+    --teal: #55c8dd;
+    --orange: #f0a34e;
+    --purple: #9b8cf2;
+    --blue-dot: #6fcbe8;
+    --accent-orange: #f0a34e;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background-color: var(--bg);
+    background-image:
+      linear-gradient(var(--grid-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+    background-size: 44px 44px;
+    color: var(--cream);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    padding: 40px 20px 80px;
+  }
+  .wrap {
+    max-width: 640px;
+    margin: 0 auto;
+  }
+  h1 {
+    font-size: 40px;
+    font-weight: 800;
+    line-height: 1.05;
+    margin: 0;
+    letter-spacing: -0.5px;
+    text-transform: uppercase;
+  }
+  h1 .accent { color: var(--orange); }
+  .subtitle {
+    font-family: "Courier New", Courier, monospace;
+    letter-spacing: 3px;
+    color: var(--muted);
+    font-size: 14px;
+    margin: 10px 0 20px;
+    text-transform: uppercase;
+  }
+  .session-badge {
+    display: inline-block;
+    background: rgba(85, 200, 221, 0.08);
+    border: 1px solid rgba(85, 200, 221, 0.35);
+    color: var(--teal);
+    font-family: "Courier New", Courier, monospace;
+    letter-spacing: 2px;
+    font-size: 13px;
+    padding: 12px 20px;
+    border-radius: 10px;
+    margin-bottom: 24px;
+  }
+  hr {
+    border: none;
+    border-top: 1px dashed rgba(255,255,255,0.15);
+    margin: 24px 0;
+  }
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    border-radius: 18px;
+    padding: 24px;
+    margin-bottom: 24px;
+  }
+  .panel-label {
+    font-family: "Courier New", Courier, monospace;
+    letter-spacing: 3px;
+    color: var(--muted);
+    font-size: 13px;
+    margin-bottom: 16px;
+    text-transform: uppercase;
+  }
+  .list-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--row);
+    border: 1px solid var(--row-border);
+    border-radius: 12px;
+    padding: 18px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    transition: border-color 0.15s ease;
+  }
+  .list-row:hover { border-color: rgba(255,255,255,0.2); }
+  .list-row.active { border-color: var(--orange); }
+  .dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 4px;
+    flex-shrink: 0;
+  }
+  .list-row .name {
+    flex: 1;
+    font-size: 18px;
+    font-weight: 600;
+  }
+  .list-row .count {
+    color: var(--muted);
+    font-size: 16px;
+    font-family: "Courier New", Courier, monospace;
+  }
+  .list-row .delete-list {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 18px;
+    cursor: pointer;
+    padding: 4px 8px;
+    line-height: 1;
+    visibility: hidden;
+  }
+  .list-row:hover .delete-list { visibility: visible; }
+  .list-row .delete-list:hover { color: #e8735f; }
+
+  .new-list-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px dashed rgba(255,255,255,0.12);
+  }
+
+  input[type="text"], select {
+    background: var(--row);
+    border: 1px solid var(--row-border);
+    color: var(--cream);
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-size: 15px;
+    font-family: inherit;
+    width: 100%;
+  }
+  input[type="text"]::placeholder { color: var(--muted); }
+  input[type="text"]:focus, select:focus {
+    outline: none;
+    border-color: var(--teal);
+  }
+
+  .icon-btn {
+    background: var(--row);
+    border: 1px solid var(--row-border);
+    color: var(--teal);
+    border-radius: 10px;
+    width: 48px;
+    flex-shrink: 0;
+    font-size: 22px;
+    cursor: pointer;
+  }
+  .icon-btn:hover { border-color: var(--teal); }
+
+  .task-panel-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  .task-panel-title {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 26px;
+    font-weight: 700;
+  }
+  .task-panel-title .dot { margin-top: 8px; }
+  .filters {
+    display: inline-flex;
+    background: var(--row);
+    border: 1px solid var(--row-border);
+    border-radius: 999px;
+    padding: 4px;
+  }
+  .filters button {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-family: "Courier New", Courier, monospace;
+    letter-spacing: 2px;
+    font-size: 13px;
+    padding: 10px 18px;
+    border-radius: 999px;
+    cursor: pointer;
+  }
+  .filters button.active {
+    background: rgba(85, 200, 221, 0.15);
+    color: var(--teal);
+  }
+
+  .task-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .task-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--row);
+    border: 1px solid var(--row-border);
+    border-radius: 12px;
+    padding: 14px 16px;
+  }
+  .task-item input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    accent-color: var(--orange);
+    flex-shrink: 0;
+    cursor: pointer;
+  }
+  .task-item .task-text {
+    flex: 1;
+    font-size: 16px;
+  }
+  .task-item.done .task-text {
+    text-decoration: line-through;
+    color: var(--muted);
+  }
+  .task-item .priority-tag {
+    font-family: "Courier New", Courier, monospace;
+    font-size: 11px;
+    letter-spacing: 1px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    flex-shrink: 0;
+    text-transform: uppercase;
+  }
+  .priority-high { background: rgba(232, 115, 95, 0.15); color: #e8735f; }
+  .priority-medium { background: rgba(240, 163, 78, 0.15); color: var(--orange); }
+  .priority-low { background: rgba(85, 200, 221, 0.15); color: var(--teal); }
+  .task-item .due-tag {
+    font-family: "Courier New", Courier, monospace;
+    font-size: 11px;
+    color: var(--muted);
+    flex-shrink: 0;
+  }
+  .task-item .delete-task {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 18px;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .task-item .delete-task:hover { color: #e8735f; }
+
+  .empty-state {
+    text-align: center;
+    color: var(--muted);
+    padding: 32px 0;
+    font-size: 15px;
+  }
+
+  .add-task-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .add-task-row {
+    display: flex;
+    gap: 10px;
+  }
+  .add-task-row select { flex: 1; }
+  .add-task-btn {
+    background: var(--orange);
+    border: none;
+    color: #241a08;
+    font-weight: 700;
+    font-size: 16px;
+    padding: 14px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    width: 100%;
+  }
+  .add-task-btn:hover { filter: brightness(1.08); }
+
+  @media (max-width: 480px) {
+    h1 { font-size: 30px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Skill<span class="accent">Craft</span> // Task<br>Blueprint</h1>
+  <div class="subtitle">Personal task planning sheet</div>
+  <div class="session-badge">SESSION-ONLY &middot; NOT SAVED ON REFRESH</div>
+  <hr>
+
+  <div class="panel">
+    <div class="panel-label">Lists</div>
+    <div id="lists-container"></div>
+    <div class="new-list-row">
+      <input type="text" id="new-list-input" placeholder="New list name">
+      <button class="icon-btn" id="add-list-btn" aria-label="Add list">+</button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="task-panel-header">
+      <div class="task-panel-title">
+        <span class="dot" id="active-list-dot"></span>
+        <span id="active-list-name">Getting started</span>
+      </div>
+      <div class="filters">
+        <button data-filter="all" class="active">All</button>
+        <button data-filter="active">Active</button>
+        <button data-filter="done">Done</button>
+      </div>
+    </div>
+
+    <div class="task-list" id="task-list"></div>
+
+    <div class="add-task-form">
+      <input type="text" id="new-task-input" placeholder="Add a task to Getting started...">
+      <div class="add-task-row">
+        <select id="priority-select">
+          <option value="low">Low priority</option>
+          <option value="medium" selected>Medium priority</option>
+          <option value="high">High priority</option>
+        </select>
+        <select id="due-select">
+          <option value="">No due date</option>
+          <option value="today">Today</option>
+          <option value="tomorrow">Tomorrow</option>
+          <option value="week">This week</option>
+        </select>
+      </div>
+      <button class="add-task-btn" id="add-task-btn">Add task</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  const listColors = ['#f0a34e', '#6fcbe8', '#9b8cf2', '#e8735f', '#7cd992'];
+
+  let lists = [
+    {
+      id: 'getting-started',
+      name: 'Getting started',
+      color: '#f0a34e',
+      tasks: [
+        { id: 1, text: 'Explore the SkillCraft dashboard', done: false, priority: 'medium', due: '' },
+        { id: 2, text: 'Pick your first module', done: false, priority: 'high', due: 'today' },
+        { id: 3, text: 'Say hello in the community', done: false, priority: 'low', due: '' }
+      ]
+    },
+    { id: 'work', name: 'Work', color: '#6fcbe8', tasks: [] },
+    { id: 'personal', name: 'Personal', color: '#9b8cf2', tasks: [] }
+  ];
+
+  let activeListId = 'getting-started';
+  let activeFilter = 'all';
+  let nextTaskId = 4;
+  let colorIndex = lists.length;
+
+  const listsContainer = document.getElementById('lists-container');
+  const activeListDot = document.getElementById('active-list-dot');
+  const activeListName = document.getElementById('active-list-name');
+  const taskListEl = document.getElementById('task-list');
+  const newTaskInput = document.getElementById('new-task-input');
+  const prioritySelect = document.getElementById('priority-select');
+  const dueSelect = document.getElementById('due-select');
+  const newListInput = document.getElementById('new-list-input');
+
+  function getActiveList() {
+    return lists.find(l => l.id === activeListId);
+  }
+
+  function dueLabel(due) {
+    return { today: 'Today', tomorrow: 'Tomorrow', week: 'This week' }[due] || '';
+  }
+
+  function renderLists() {
+    listsContainer.innerHTML = '';
+    lists.forEach(list => {
+      const row = document.createElement('div');
+      row.className = 'list-row' + (list.id === activeListId ? ' active' : '');
+
+      const dot = document.createElement('div');
+      dot.className = 'dot';
+      dot.style.background = list.color;
+
+      const name = document.createElement('div');
+      name.className = 'name';
+      name.textContent = list.name;
+
+      const count = document.createElement('div');
+      count.className = 'count';
+      count.textContent = list.tasks.length;
+
+      row.appendChild(dot);
+      row.appendChild(name);
+      row.appendChild(count);
+
+      if (lists.length > 1) {
+        const del = document.createElement('button');
+        del.className = 'delete-list';
+        del.textContent = '\u00d7';
+        del.setAttribute('aria-label', 'Delete list');
+        del.addEventListener('click', (e) => {
+          e.stopPropagation();
+          deleteList(list.id);
+        });
+        row.appendChild(del);
+      }
+
+      row.addEventListener('click', () => {
+        activeListId = list.id;
+        activeFilter = 'all';
+        renderAll();
+      });
+
+      listsContainer.appendChild(row);
+    });
+  }
+
+  function renderTaskPanelHeader() {
+    const list = getActiveList();
+    activeListDot.style.background = list.color;
+    activeListName.textContent = list.name;
+    newTaskInput.placeholder = 'Add a task to ' + list.name + '...';
+
+    document.querySelectorAll('.filters button').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.filter === activeFilter);
+    });
+  }
+
+  function renderTasks() {
+    const list = getActiveList();
+    let tasks = list.tasks;
+    if (activeFilter === 'active') tasks = tasks.filter(t => !t.done);
+    if (activeFilter === 'done') tasks = tasks.filter(t => t.done);
+
+    taskListEl.innerHTML = '';
+
+    if (tasks.length === 0) {
+      const empty = document.createElement('div');
+      empty.className = 'empty-state';
+      empty.textContent = activeFilter === 'done'
+        ? 'No completed tasks yet.'
+        : (list.tasks.length === 0 ? 'No tasks yet. Add your first one below.' : 'Nothing here.');
+      taskListEl.appendChild(empty);
+      return;
+    }
+
+    tasks.forEach(task => {
+      const item = document.createElement('div');
+      item.className = 'task-item' + (task.done ? ' done' : '');
+
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.checked = task.done;
+      checkbox.addEventListener('change', () => {
+        task.done = checkbox.checked;
+        renderAll();
+      });
+
+      const text = document.createElement('div');
+      text.className = 'task-text';
+      text.textContent = task.text;
+
+      const priorityTag = document.createElement('span');
+      priorityTag.className = 'priority-tag priority-' + task.priority;
+      priorityTag.textContent = task.priority;
+
+      item.appendChild(checkbox);
+      item.appendChild(text);
+
+      if (task.due) {
+        const dueTag = document.createElement('span');
+        dueTag.className = 'due-tag';
+        dueTag.textContent = dueLabel(task.due);
+        item.appendChild(dueTag);
+      }
+
+      item.appendChild(priorityTag);
+
+      const del = document.createElement('button');
+      del.className = 'delete-task';
+      del.textContent = '\u00d7';
+      del.setAttribute('aria-label', 'Delete task');
+      del.addEventListener('click', () => {
+        list.tasks = list.tasks.filter(t => t.id !== task.id);
+        renderAll();
+      });
+      item.appendChild(del);
+
+      taskListEl.appendChild(item);
+    });
+  }
+
+  function renderAll() {
+    renderLists();
+    renderTaskPanelHeader();
+    renderTasks();
+  }
+
+  function addTask() {
+    const text = newTaskInput.value.trim();
+    if (!text) return;
+    const list = getActiveList();
+    list.tasks.push({
+      id: nextTaskId++,
+      text,
+      done: false,
+      priority: prioritySelect.value,
+      due: dueSelect.value
+    });
+    newTaskInput.value = '';
+    prioritySelect.value = 'medium';
+    dueSelect.value = '';
+    renderAll();
+  }
+
+  function addList() {
+    const name = newListInput.value.trim();
+    if (!name) return;
+    const id = name.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + Date.now();
+    const color = listColors[colorIndex % listColors.length];
+    colorIndex++;
+    lists.push({ id, name, color, tasks: [] });
+    newListInput.value = '';
+    activeListId = id;
+    activeFilter = 'all';
+    renderAll();
+  }
+
+  function deleteList(id) {
+    lists = lists.filter(l => l.id !== id);
+    if (activeListId === id) {
+      activeListId = lists[0].id;
+      activeFilter = 'all';
+    }
+    renderAll();
+  }
+
+  document.getElementById('add-task-btn').addEventListener('click', addTask);
+  newTaskInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') addTask();
+  });
+
+  document.getElementById('add-list-btn').addEventListener('click', addList);
+  newListInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') addList();
+  });
+
+  document.querySelectorAll('.filters button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      activeFilter = btn.dataset.filter;
+      renderAll();
+    });
+  });
+
+  renderAll();
+})();
+</script>
+</body>
+</html>
