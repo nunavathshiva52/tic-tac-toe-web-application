@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>X . O — Tic Tac Toe</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --panel: #161b22;
+    --panel-2: #1c2330;
+    --border: #2a3140;
+    --cream: #f2ede2;
+    --x-color: #f0a35d;
+    --o-color: #4fb6e8;
+    --muted: #7d8695;
+    --text: #eef1f5;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: radial-gradient(circle at 50% 0%, #1a212e 0%, var(--bg) 55%);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: var(--text);
+    display: flex;
+    justify-content: center;
+    padding: 48px 20px 80px;
+  }
+  .app {
+    width: 100%;
+    max-width: 420px;
+  }
+  .title {
+    text-align: center;
+    margin-bottom: 4px;
+  }
+  .title .glyphs {
+    font-size: 46px;
+    font-weight: 800;
+    letter-spacing: 4px;
+  }
+  .title .glyphs .x { color: var(--x-color); }
+  .title .glyphs .o { color: var(--o-color); }
+  .title .glyphs .dot { color: var(--muted); margin: 0 6px; }
+  .title .subtitle {
+    text-align: center;
+    letter-spacing: 6px;
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 2px;
+    font-weight: 600;
+  }
+  .mode-toggle {
+    display: flex;
+    background: var(--panel);
+    border-radius: 14px;
+    padding: 6px;
+    margin: 28px 0 20px;
+    border: 1px solid var(--border);
+  }
+  .mode-toggle button {
+    flex: 1;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    font-size: 15px;
+    font-weight: 700;
+    padding: 14px 8px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .mode-toggle button.active {
+    background: var(--cream);
+    color: #1a1a1a;
+  }
+  .scoreboard {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+  .score-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    text-align: center;
+    padding: 16px 4px;
+  }
+  .score-card .label {
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .score-card .value {
+    font-size: 26px;
+    font-weight: 800;
+  }
+  .score-card.x .value { color: var(--x-color); }
+  .score-card.o .value { color: var(--o-color); }
+  .turn {
+    text-align: center;
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    min-height: 28px;
+  }
+  .board {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 14px;
+  }
+  .cell {
+    aspect-ratio: 1 / 1;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.1s ease;
+    user-select: none;
+  }
+  .cell:hover:not(.filled) {
+    background: #212938;
+  }
+  .cell:active:not(.filled) {
+    transform: scale(0.97);
+  }
+  .cell.filled { cursor: default; }
+  .cell.x { color: var(--x-color); }
+  .cell.o { color: var(--o-color); }
+  .cell.win {
+    background: rgba(242, 237, 226, 0.08);
+    border-color: rgba(242, 237, 226, 0.3);
+  }
+  .actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+  }
+  .actions button {
+    flex: 1;
+    padding: 16px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    border: 1px solid var(--border);
+  }
+  #new-round-btn {
+    background: var(--cream);
+    color: #1a1a1a;
+    border: none;
+  }
+  #reset-scores-btn {
+    background: transparent;
+    color: var(--muted);
+  }
+  #reset-scores-btn:hover { color: var(--text); }
+  @media (prefers-reduced-motion: reduce) {
+    .cell { transition: none; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="title">
+    <div class="glyphs"><span class="x">X</span><span class="dot">&middot;</span><span class="o">O</span></div>
+    <div class="subtitle">TIC TAC TOE</div>
+  </div>
+
+  <div class="mode-toggle">
+    <button id="mode-two-player" class="active">Two player</button>
+    <button id="mode-vs-computer">Vs computer</button>
+  </div>
+
+  <div class="scoreboard">
+    <div class="score-card x">
+      <div class="label">X WINS</div>
+      <div class="value" id="score-x">0</div>
+    </div>
+    <div class="score-card">
+      <div class="label">DRAWS</div>
+      <div class="value" id="score-draw">0</div>
+    </div>
+    <div class="score-card o">
+      <div class="label">O WINS</div>
+      <div class="value" id="score-o">0</div>
+    </div>
+  </div>
+
+  <div class="turn" id="turn-label">X's turn</div>
+
+  <div class="board" id="board"></div>
+
+  <div class="actions">
+    <button id="new-round-btn">New round</button>
+    <button id="reset-scores-btn">Reset scores</button>
+  </div>
+</div>
+
+<script>
+(function () {
+  const boardEl = document.getElementById('board');
+  const turnLabel = document.getElementById('turn-label');
+  const scoreXEl = document.getElementById('score-x');
+  const scoreOEl = document.getElementById('score-o');
+  const scoreDrawEl = document.getElementById('score-draw');
+  const modeTwoPlayerBtn = document.getElementById('mode-two-player');
+  const modeVsComputerBtn = document.getElementById('mode-vs-computer');
+  const newRoundBtn = document.getElementById('new-round-btn');
+  const resetScoresBtn = document.getElementById('reset-scores-btn');
+
+  const WIN_LINES = [
+    [0,1,2],[3,4,5],[6,7,8],
+    [0,3,6],[1,4,7],[2,5,8],
+    [0,4,8],[2,4,6]
+  ];
+
+  let board = Array(9).fill(null);
+  let currentPlayer = 'X';
+  let gameOver = false;
+  let vsComputer = false;
+  let scores = { X: 0, O: 0, draw: 0 };
+
+  function render() {
+    boardEl.innerHTML = '';
+    board.forEach((mark, i) => {
+      const cell = document.createElement('div');
+      cell.className = 'cell' + (mark ? ' filled ' + mark.toLowerCase() : '');
+      cell.textContent = mark || '';
+      cell.addEventListener('click', () => handleCellClick(i));
+      boardEl.appendChild(cell);
+    });
+  }
+
+  function checkResult(b) {
+    for (const line of WIN_LINES) {
+      const [a, c, d] = line;
+      if (b[a] && b[a] === b[c] && b[a] === b[d]) {
+        return { winner: b[a], line };
+      }
+    }
+    if (b.every(cell => cell)) return { winner: 'draw', line: null };
+    return null;
+  }
+
+  function updateTurnLabel() {
+    if (gameOver) return;
+    turnLabel.textContent = currentPlayer + "'s turn";
+  }
+
+  function highlightWin(line) {
+    const cells = boardEl.children;
+    line.forEach(i => cells[i].classList.add('win'));
+  }
+
+  function finishGame(result) {
+    gameOver = true;
+    if (result.winner === 'draw') {
+      scores.draw++;
+      turnLabel.textContent = "It's a draw";
+    } else {
+      scores[result.winner]++;
+      turnLabel.textContent = result.winner + ' wins';
+      highlightWin(result.line);
+    }
+    updateScoreboard();
+  }
+
+  function updateScoreboard() {
+    scoreXEl.textContent = scores.X;
+    scoreOEl.textContent = scores.O;
+    scoreDrawEl.textContent = scores.draw;
+  }
+
+  function handleCellClick(i) {
+    if (gameOver || board[i]) return;
+    if (vsComputer && currentPlayer === 'O') return;
+
+    playMove(i);
+
+    if (!gameOver && vsComputer && currentPlayer === 'O') {
+      setTimeout(computerMove, 400);
+    }
+  }
+
+  function playMove(i) {
+    board[i] = currentPlayer;
+    render();
+
+    const result = checkResult(board);
+    if (result) {
+      finishGame(result);
+      return;
+    }
+    currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+    updateTurnLabel();
+  }
+
+  function computerMove() {
+    if (gameOver) return;
+    const move = bestMove(board);
+    if (move !== -1) playMove(move);
+  }
+
+  // Simple unbeatable AI via minimax
+  function bestMove(b) {
+    let best = { score: -Infinity, index: -1 };
+    for (let i = 0; i < 9; i++) {
+      if (!b[i]) {
+        b[i] = 'O';
+        const score = minimax(b, 0, false);
+        b[i] = null;
+        if (score > best.score) best = { score, index: i };
+      }
+    }
+    return best.index;
+  }
+
+  function minimax(b, depth, isMaximizing) {
+    const result = checkResult(b);
+    if (result) {
+      if (result.winner === 'O') return 10 - depth;
+      if (result.winner === 'X') return depth - 10;
+      return 0;
+    }
+
+    if (isMaximizing) {
+      let best = -Infinity;
+      for (let i = 0; i < 9; i++) {
+        if (!b[i]) {
+          b[i] = 'O';
+          best = Math.max(best, minimax(b, depth + 1, false));
+          b[i] = null;
+        }
+      }
+      return best;
+    } else {
+      let best = Infinity;
+      for (let i = 0; i < 9; i++) {
+        if (!b[i]) {
+          b[i] = 'X';
+          best = Math.min(best, minimax(b, depth + 1, true));
+          b[i] = null;
+        }
+      }
+      return best;
+    }
+  }
+
+  function newRound() {
+    board = Array(9).fill(null);
+    currentPlayer = 'X';
+    gameOver = false;
+    render();
+    updateTurnLabel();
+  }
+
+  function resetScores() {
+    scores = { X: 0, O: 0, draw: 0 };
+    updateScoreboard();
+  }
+
+  modeTwoPlayerBtn.addEventListener('click', () => {
+    vsComputer = false;
+    modeTwoPlayerBtn.classList.add('active');
+    modeVsComputerBtn.classList.remove('active');
+    newRound();
+  });
+
+  modeVsComputerBtn.addEventListener('click', () => {
+    vsComputer = true;
+    modeVsComputerBtn.classList.add('active');
+    modeTwoPlayerBtn.classList.remove('active');
+    newRound();
+  });
+
+  newRoundBtn.addEventListener('click', newRound);
+  resetScoresBtn.addEventListener('click', resetScores);
+
+  render();
+  updateTurnLabel();
+})();
+</script>
+</body>
+</html>
