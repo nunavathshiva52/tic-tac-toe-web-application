@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SkillCraft — Skills are forged, not downloaded</title>
+<style>
+  :root {
+    --bg-top: #16241c;
+    --bg-bottom: #0a0f0d;
+    --cream: #f3efe6;
+    --muted: #a9b0ab;
+    --gold: #dba24a;
+    --gold-dark: #c98f38;
+    --teal: #4fd1a5;
+    --border: rgba(255,255,255,0.12);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: radial-gradient(ellipse 900px 500px at 50% 0%, var(--bg-top) 0%, var(--bg-bottom) 65%);
+    background-color: var(--bg-bottom);
+    color: var(--cream);
+    font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+  }
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 28px 24px 100px;
+  }
+  nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 90px;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .logo-badge {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--gold) 0%, var(--teal) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 15px;
+    color: #101a14;
+  }
+  .brand-name {
+    font-size: 21px;
+    font-weight: 800;
+  }
+  .brand-name .skill { color: var(--cream); }
+  .brand-name .craft { color: var(--gold); }
+  .nav-right {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .btn-start {
+    background: var(--gold);
+    color: #241a08;
+    border: none;
+    font-weight: 700;
+    font-size: 15px;
+    padding: 14px 28px;
+    border-radius: 12px;
+    cursor: pointer;
+    line-height: 1.3;
+  }
+  .btn-start:hover { background: var(--gold-dark); }
+  .menu-btn {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    color: var(--cream);
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .menu-btn:hover { background: rgba(255,255,255,0.1); }
+
+  .hero { max-width: 760px; }
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--teal);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    margin-bottom: 24px;
+  }
+  .eyebrow .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--teal);
+    box-shadow: 0 0 12px var(--teal);
+  }
+  h1 {
+    font-size: 58px;
+    line-height: 1.08;
+    font-weight: 800;
+    margin: 0 0 28px;
+    letter-spacing: -1px;
+  }
+  h1 .gradient {
+    background: linear-gradient(90deg, var(--gold) 0%, var(--teal) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .lede {
+    font-size: 19px;
+    line-height: 1.65;
+    color: var(--muted);
+    max-width: 560px;
+    margin: 0 0 40px;
+  }
+  .cta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .btn-primary {
+    background: var(--gold);
+    color: #241a08;
+    border: none;
+    font-weight: 700;
+    font-size: 16px;
+    padding: 18px 32px;
+    border-radius: 12px;
+    cursor: pointer;
+  }
+  .btn-primary:hover { background: var(--gold-dark); }
+  .btn-secondary {
+    background: transparent;
+    color: var(--cream);
+    border: 1px solid var(--border);
+    font-weight: 700;
+    font-size: 16px;
+    padding: 18px 32px;
+    border-radius: 12px;
+    cursor: pointer;
+  }
+  .btn-secondary:hover { background: rgba(255,255,255,0.06); }
+
+  @media (max-width: 640px) {
+    h1 { font-size: 40px; }
+    .lede { font-size: 17px; }
+    .btn-start { padding: 12px 20px; font-size: 14px; }
+    nav { margin-bottom: 60px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <nav>
+    <div class="brand">
+      <div class="logo-badge">SC</div>
+      <div class="brand-name"><span class="skill">Skill</span> <span class="craft">Craft</span></div>
+    </div>
+    <div class="nav-right">
+      <button class="btn-start">Start<br>Building</button>
+      <button class="menu-btn" aria-label="Open menu">&#9776;</button>
+    </div>
+  </nav>
+
+  <div class="hero">
+    <div class="eyebrow"><span class="dot"></span>SKILLCRAFT TECHNOLOGY</div>
+    <h1>Skills are <span class="gradient">forged</span>,<br>not downloaded.</h1>
+    <p class="lede">SkillCraft is a hands-on workshop for people who'd rather build than binge tutorials. Every module ends with something real: a working app, not a certificate.</p>
+    <div class="cta-row">
+      <button class="btn-primary">Explore skills</button>
+      <button class="btn-secondary">See how it works</button>
+    </div>
+  </div>
+</div>
+</body>
+</html>
